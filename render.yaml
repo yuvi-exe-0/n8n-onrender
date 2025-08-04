@@ -1,4 +1,4 @@
-services: 
+services:
   - type: web
     name: n8n
     env: docker
@@ -12,13 +12,13 @@ services:
       - key: N8N_BASIC_AUTH_USER
         value: admin
       - key: N8N_BASIC_AUTH_PASSWORD
-        value: securepass123
+        sync: false  # Set manually in Render dashboard
 
       # === External URL ===
       - key: WEBHOOK_URL
         value: https://n8n-onrender.onrender.com
       - key: N8N_HOST
-        value: n8n-onrender
+        value: 0.0.0.0  # Important for Docker container accessibility
       - key: N8N_PORT
         value: "5678"
 
@@ -29,17 +29,31 @@ services:
         fromService:
           name: n8n-postgres
           type: database
-          property: host
+          property: connectionString.host
       - key: DB_POSTGRESDB_PORT
-        value: "5432"
+        fromService:
+          name: n8n-postgres
+          type: database
+          property: connectionString.port
       - key: DB_POSTGRESDB_DATABASE
-        value: n8n
+        fromService:
+          name: n8n-postgres
+          type: database
+          property: connectionString.database
       - key: DB_POSTGRESDB_USER
-        value: n8n
+        fromService:
+          name: n8n-postgres
+          type: database
+          property: connectionString.user
       - key: DB_POSTGRESDB_PASSWORD
-        sync: false # set manually in dashboard
+        fromService:
+          name: n8n-postgres
+          type: database
+          property: connectionString.password
+
+      # === Additional Config ===
       - key: N8N_ENCRYPTION_KEY
-        sync: false # set manually too
+        sync: false  # Set manually in Render dashboard
       - key: EXECUTIONS_PROCESS
         value: main
       - key: GENERIC_TIMEZONE
@@ -51,17 +65,4 @@ databases:
     user: n8n
 
   - name: n8n-redis
-    ipAllowList: [] # open access for Render services
-envVars:
-  - key: DB_TYPE
-    value: postgresdb
-  - key: DB_POSTGRESDB_HOST
-    value: ${PGHOST}
-  - key: DB_POSTGRESDB_PORT
-    value: ${PGPORT}
-  - key: DB_POSTGRESDB_DATABASE
-    value: ${PGDATABASE}
-  - key: DB_POSTGRESDB_USER
-    value: ${PGUSER}
-  - key: DB_POSTGRESDB_PASSWORD
-    value: ${PGPASSWORD}
+    ipAllowList: []  # Allow access from Render services
