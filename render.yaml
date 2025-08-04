@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: n8n
+    name: n8n-onrender
     env: docker
     plan: free
-    dockerfilePath: ""
+    dockerfilePath: Dockerfile
     autoDeploy: true
     envVars:
       # === Auth and Web UI ===
@@ -13,12 +13,18 @@ services:
         value: admin
       - key: N8N_BASIC_AUTH_PASSWORD
         sync: false  # Set manually in Render dashboard
+      - key: N8N_REDIS_HOST
+        value: ${REDIS_HOST}
+      - key: N8N_REDIS_PORT
+        value: ${REDIS_PORT}
+      - key: QUEUE_BULL_REDIS_DB
+        value: "0"
 
       # === External URL ===
       - key: WEBHOOK_URL
         value: https://n8n-onrender.onrender.com
       - key: N8N_HOST
-        value: 0.0.0.0  # Important for Docker container accessibility
+        value: 0.0.0.0
       - key: N8N_PORT
         value: "5678"
 
@@ -26,30 +32,15 @@ services:
       - key: DB_TYPE
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
-        fromService:
-          name: n8n-postgres
-          type: database
-          property: connectionString.host
+        value: ${PGHOST}
       - key: DB_POSTGRESDB_PORT
-        fromService:
-          name: n8n-postgres
-          type: database
-          property: connectionString.port
+        value: ${PGPORT}
       - key: DB_POSTGRESDB_DATABASE
-        fromService:
-          name: n8n-postgres
-          type: database
-          property: connectionString.database
+        value: ${PGDATABASE}
       - key: DB_POSTGRESDB_USER
-        fromService:
-          name: n8n-postgres
-          type: database
-          property: connectionString.user
+        value: ${PGUSER}
       - key: DB_POSTGRESDB_PASSWORD
-        fromService:
-          name: n8n-postgres
-          type: database
-          property: connectionString.password
+        value: ${PGPASSWORD}
 
       # === Additional Config ===
       - key: N8N_ENCRYPTION_KEY
