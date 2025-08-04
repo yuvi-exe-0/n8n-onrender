@@ -1,10 +1,12 @@
-services:
+services: 
   - type: web
     name: n8n
     env: docker
-    plan: free
-    dockerfilePath: ""
+    plan: starter # or standard/pro as needed
+    dockerfilePath: ""  # Assumes you have a Dockerfile at root. If not, use `dockerComposeFilePath`
     autoDeploy: true
+    healthCheckPath: /
+    
     envVars:
       # === Auth and Web UI ===
       - key: N8N_BASIC_AUTH_ACTIVE
@@ -24,11 +26,11 @@ services:
 
       # === PostgreSQL DB ===
       - key: DB_TYPE
-        value: postgres
+        value: postgresdb
       - key: DB_POSTGRESDB_HOST
         fromService:
           type: pserv
-          name: n8n-db
+          name: n8n-postgres   # <-- ⚠️ must match database name below
       - key: DB_POSTGRESDB_PORT
         value: "5432"
       - key: DB_POSTGRESDB_DATABASE
@@ -36,33 +38,32 @@ services:
       - key: DB_POSTGRESDB_USER
         value: n8n
       - key: DB_POSTGRESDB_PASSWORD
-        fromService:
-          type: pserv
-          name: n8n-db
-          property: password
+        sync: false # 👈 Add this manually in Render Dashboard (Secrets tab)
 
-      # === Redis for Queue Mode ===
-      - key: QUEUE_MODE_ENABLED
-        value: "true"
-      - key: QUEUE_MODE_REDIS_HOST
+      # === Redis (optional for queues) ===
+      - key: QUEUE_MODE
+        value: redis
+      - key: QUEUE_REDIS_HOST
         fromService:
           type: pserv
           name: n8n-redis
-      - key: QUEUE_MODE_REDIS_PORT
+      - key: QUEUE_REDIS_PORT
         value: "6379"
 
-      # === Required if using queue mode ===
-      - key: EXECUTIONS_MODE
-        value: queue
+      # === Security ===
+      - key: N8N_ENCRYPTION_KEY
+        sync: false # 👈 Add this manually in Render Dashboard
+
+      # === Runtime settings ===
+      - key: EXECUTIONS_PROCESS
+        value: main
+      - key: GENERIC_TIMEZONE
+        value: UTC
 
 databases:
-  - name: n8n-db
+  - name: n8n-postgres
     databaseName: n8n
     user: n8n
-    plan: free
 
-services:
-  - type: pserv
-    name: n8n-redis
-    plan: free
-    env: redis
+  - name: n8n-redis
+    ipAllowList: [] # open to all internal Render services
