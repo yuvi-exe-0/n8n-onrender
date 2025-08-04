@@ -52,3 +52,16 @@ databases:
 
   - name: n8n-redis
     ipAllowList: [] # open access for Render services
+envVars:
+  - key: DB_TYPE
+    value: postgresdb
+  - key: DB_POSTGRESDB_HOST
+    value: ${PGHOST}
+  - key: DB_POSTGRESDB_PORT
+    value: ${PGPORT}
+  - key: DB_POSTGRESDB_DATABASE
+    value: ${PGDATABASE}
+  - key: DB_POSTGRESDB_USER
+    value: ${PGUSER}
+  - key: DB_POSTGRESDB_PASSWORD
+    value: ${PGPASSWORD}
