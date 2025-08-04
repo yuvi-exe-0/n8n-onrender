@@ -2,11 +2,9 @@ services:
   - type: web
     name: n8n
     env: docker
-    plan: starter # or standard/pro as needed
-    dockerfilePath: ""  # Assumes you have a Dockerfile at root. If not, use `dockerComposeFilePath`
+    plan: free
+    dockerfilePath: ""
     autoDeploy: true
-    healthCheckPath: /
-    
     envVars:
       # === Auth and Web UI ===
       - key: N8N_BASIC_AUTH_ACTIVE
@@ -29,8 +27,9 @@ services:
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
         fromService:
-          type: pserv
-          name: n8n-postgres   # <-- ⚠️ must match database name below
+          name: n8n-postgres
+          type: database
+          property: host
       - key: DB_POSTGRESDB_PORT
         value: "5432"
       - key: DB_POSTGRESDB_DATABASE
@@ -38,23 +37,9 @@ services:
       - key: DB_POSTGRESDB_USER
         value: n8n
       - key: DB_POSTGRESDB_PASSWORD
-        sync: false # 👈 Add this manually in Render Dashboard (Secrets tab)
-
-      # === Redis (optional for queues) ===
-      - key: QUEUE_MODE
-        value: redis
-      - key: QUEUE_REDIS_HOST
-        fromService:
-          type: pserv
-          name: n8n-redis
-      - key: QUEUE_REDIS_PORT
-        value: "6379"
-
-      # === Security ===
+        sync: false # set manually in dashboard
       - key: N8N_ENCRYPTION_KEY
-        sync: false # 👈 Add this manually in Render Dashboard
-
-      # === Runtime settings ===
+        sync: false # set manually too
       - key: EXECUTIONS_PROCESS
         value: main
       - key: GENERIC_TIMEZONE
@@ -66,4 +51,4 @@ databases:
     user: n8n
 
   - name: n8n-redis
-    ipAllowList: [] # open to all internal Render services
+    ipAllowList: [] # open access for Render services
