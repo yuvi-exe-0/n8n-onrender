@@ -12,7 +12,7 @@ services:
       - key: N8N_BASIC_AUTH_USER
         value: admin
       - key: N8N_BASIC_AUTH_PASSWORD
-        sync: false
+        value: securepass123
       - key: WEBHOOK_URL
         value: https://n8n-onrender.onrender.com
       - key: N8N_HOST
@@ -22,17 +22,27 @@ services:
       - key: DB_TYPE
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
-        value: ${PGHOST}
+        fromDatabase:
+          name: n8n-postgres
+          property: host
       - key: DB_POSTGRESDB_PORT
-        value: ${PGPORT}
+        fromDatabase:
+          name: n8n-postgres
+          property: port
       - key: DB_POSTGRESDB_DATABASE
-        value: ${PGDATABASE}
+        fromDatabase:
+          name: n8n-postgres
+          property: database
       - key: DB_POSTGRESDB_USER
-        value: ${PGUSER}
+        fromDatabase:
+          name: n8n-postgres
+          property: user
       - key: DB_POSTGRESDB_PASSWORD
-        value: ${PGPASSWORD}
+        fromDatabase:
+          name: n8n-postgres
+          property: password
       - key: N8N_ENCRYPTION_KEY
-        sync: false
+        value: your_encryption_key_here
       - key: EXECUTIONS_PROCESS
         value: main
       - key: GENERIC_TIMEZONE
@@ -45,13 +55,3 @@ databases:
     plan: free
     databaseName: n8n
     user: n8n
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=${PGHOST}
-      - DB_POSTGRESDB_PORT=${PGPORT}
-      - DB_POSTGRESDB_DATABASE=${PGDATABASE}
-      - DB_POSTGRESDB_USER=${PGUSER}
-      - DB_POSTGRESDB_PASSWORD=${PGPASSWORD}
-      - N8N_ENCRYPTION_KEY=your-encryption-key
-      - EXECUTIONS_PROCESS=main
-      - GENERIC_TIMEZONE=UTC
-      - EXECUTIONS_MODE=queue
