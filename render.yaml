@@ -2,9 +2,9 @@ services:
   - type: web
     name: n8n-onrender
     env: docker
-    region: frankfurt
     plan: free
-    dockerfilePath: Dockerfile
+    region: frankfurt
+    dockerImage: docker.n8n.io/n8nio/n8n
     autoDeploy: true
     envVars:
       - key: N8N_BASIC_AUTH_ACTIVE
@@ -19,41 +19,39 @@ services:
         value: 0.0.0.0
       - key: N8N_PORT
         value: "5678"
-
       - key: DB_TYPE
-        value: postgres
+        value: postgresdb
       - key: DB_POSTGRESDB_HOST
-        fromDatabase:
-          name: n8n-postgres
-          property: host
+        value: ${PGHOST}
       - key: DB_POSTGRESDB_PORT
-        fromDatabase:
-          name: n8n-postgres
-          property: port
+        value: ${PGPORT}
       - key: DB_POSTGRESDB_DATABASE
-        fromDatabase:
-          name: n8n-postgres
-          property: database
+        value: ${PGDATABASE}
       - key: DB_POSTGRESDB_USER
-        fromDatabase:
-          name: n8n-postgres
-          property: user
+        value: ${PGUSER}
       - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase:
-          name: n8n-postgres
-          property: password
-
+        value: ${PGPASSWORD}
       - key: N8N_ENCRYPTION_KEY
         sync: false
       - key: EXECUTIONS_PROCESS
         value: main
-      - key: EXECUTIONS_MODE
-        value: queue
       - key: GENERIC_TIMEZONE
         value: UTC
+      - key: EXECUTIONS_MODE
+        value: queue
 
 databases:
   - name: n8n-postgres
     plan: free
     databaseName: n8n
     user: n8n
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=${PGHOST}
+      - DB_POSTGRESDB_PORT=${PGPORT}
+      - DB_POSTGRESDB_DATABASE=${PGDATABASE}
+      - DB_POSTGRESDB_USER=${PGUSER}
+      - DB_POSTGRESDB_PASSWORD=${PGPASSWORD}
+      - N8N_ENCRYPTION_KEY=your-encryption-key
+      - EXECUTIONS_PROCESS=main
+      - GENERIC_TIMEZONE=UTC
+      - EXECUTIONS_MODE=queue
