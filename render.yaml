@@ -4,22 +4,9 @@ services:
     env: docker
     plan: free
     region: frankfurt
-    dockerfilePath: Dockerfile   # Correct way to tell Render how to build
+    dockerfilePath: Dockerfile
     autoDeploy: true
     envVars:
-      
-      - key: N8N_BASIC_AUTH_ACTIVE
-        value: "true"
-      - key: N8N_BASIC_AUTH_USER
-        value: admin
-      - key: N8N_BASIC_AUTH_PASSWORD
-        value: securepass123
-      - key: WEBHOOK_URL
-        value: https://n8n-onrender.onrender.com
-      - key: N8N_HOST
-        value: 0.0.0.0
-      - key: N8N_PORT
-        value: "5678"
       - key: DB_TYPE
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
@@ -42,14 +29,30 @@ services:
         fromDatabase:
           name: n8n-postgres
           property: password
+
+      # Optional but recommended
       - key: N8N_ENCRYPTION_KEY
-        value: your_encryption_key_here
+        value: generate-a-strong-random-key-here
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true"
+      - key: N8N_BASIC_AUTH_USER
+        value: admin
+      - key: N8N_BASIC_AUTH_PASSWORD
+        value: securepass123
+      - key: WEBHOOK_URL
+        value: https://n8n-onrender.onrender.com
+      - key: N8N_HOST
+        value: 0.0.0.0
+      - key: N8N_PORT
+        value: "5678"
       - key: EXECUTIONS_PROCESS
         value: main
       - key: GENERIC_TIMEZONE
         value: UTC
       - key: EXECUTIONS_MODE
         value: queue
+      - key: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+        value: "true"
 
 databases:
   - name: n8n-postgres
