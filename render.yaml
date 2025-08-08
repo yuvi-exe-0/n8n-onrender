@@ -1,26 +1,19 @@
 services:
-services:
   - type: web
     name: n8n-onrender
     env: docker
-    plan: free  # Explicit free plan
-    region: frankfurt  # Free tier available region
+    region: frankfurt  # Optional: Change if needed
+    plan: free
     dockerfilePath: Dockerfile
     autoDeploy: true
-envVars:
+    envVars:
       # === Auth and Web UI ===
       - key: N8N_BASIC_AUTH_ACTIVE
         value: "true"
       - key: N8N_BASIC_AUTH_USER
         value: admin
       - key: N8N_BASIC_AUTH_PASSWORD
-        sync: false  # Set manually in Render dashboard
-      - key: N8N_REDIS_HOST
-        value: ${REDIS_HOST}
-      - key: N8N_REDIS_PORT
-        value: ${REDIS_PORT}
-      - key: QUEUE_BULL_REDIS_DB
-        value: "0"
+        sync: false  # Set this manually in Render Dashboard
 
       # === External URL ===
       - key: WEBHOOK_URL
@@ -30,7 +23,7 @@ envVars:
       - key: N8N_PORT
         value: "5678"
 
-      # === PostgreSQL DB ===
+      # === PostgreSQL DB from Render-provided vars ===
       - key: DB_TYPE
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
@@ -46,16 +39,18 @@ envVars:
 
       # === Additional Config ===
       - key: N8N_ENCRYPTION_KEY
-        sync: false  # Set manually in Render dashboard
+        sync: false  # Set manually
       - key: EXECUTIONS_PROCESS
         value: main
       - key: GENERIC_TIMEZONE
         value: UTC
 
+      # === Redis not available on free tier workaround ===
+      - key: EXECUTIONS_MODE
+        value: queue  # Allows internal queue mode (no Redis required)
+
 databases:
   - name: n8n-postgres
+    plan: free
     databaseName: n8n
     user: n8n
-
-  - name: n8n-redis
-    ipAllowList: []  # Allow access from Render services
